@@ -1,3 +1,5 @@
+#define DEBUG 1
+
 #include <Arduino.h>
 #include "door.h"
 #include "button.h"
@@ -10,7 +12,10 @@ Button button(5);
 
 
 void setup() {
+  #ifdef DEBUG
   Serial.begin(9600);
+  #endif
+  
   button.setup();
   pinMode(A0, INPUT);
   pinMode(8, OUTPUT);
@@ -42,3 +47,5 @@ void loop() {
 
   //door.run();
 }
+
+

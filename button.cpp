@@ -6,7 +6,21 @@ static int Button::pressedLevel() {
 
 Button::Button(byte p) 
 {
+  init(p, PRESSED_DETECT_DELAY, LONG_PRESSED_DETECT_DELAY, READ_TIMEOUT);
+}
+
+Button::Button(byte p, int short_time, int long_time, int fuse_timeout)
+{
+  init(p, short_time, long_time, fuse_timeout);
+}
+
+void Button::init(byte p, int short_time, int long_time, int fuse_timeout)
+{
   pin = p;
+  short_pressed_min_time = short_time;
+  long_pressed_min_time = long_time;
+  delay_to_next_read = fuse_timeout;
+
   state = ButtonState::Released;
   timeout = millis();
   readTimeout = timeout;
@@ -29,9 +43,9 @@ void Button::run()
     pressedEvent = false;
     longPressedEvent = false;
     
-    if(pressedTime >= PRESSED_DETECT_DELAY) 
+    if(pressedTime >= (unsigned long)short_pressed_min_time) 
       pressedEvent = true;
-    if(pressedTime >= LONG_PRESSED_DETECT_DELAY)
+    if(pressedTime >= (unsigned long)long_pressed_min_time)
       {
         pressedEvent = false;
         longPressedEvent = !blockLongPressedEvent;
@@ -41,17 +55,17 @@ void Button::run()
 
 void Button::detectState()
 {
-  if(millis() - readTimeout > READ_TIMEOUT) 
+  if(millis() - readTimeout > (unsigned long)delay_to_next_read) 
   {
     if(digitalRead(pin) == pressedLevel()) {
       if(state == ButtonState::Released) {
+        Serial.println("Pressed " + String(pin));
         timeout = millis();
-        Serial.println("Will return pressed");
         state = ButtonState::Pressed;
       }
     } else {
       if(state == ButtonState::Pressed) {
-        Serial.println("Will return released");
+        Serial.println("Released " + String(pin));
         blockLongPressedEvent = false;
         state = ButtonState::Released;
       }
