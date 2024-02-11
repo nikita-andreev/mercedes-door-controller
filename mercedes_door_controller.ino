@@ -4,11 +4,26 @@
 #include "door.h"
 #include "button.h"
 
-//Door door;
-Button button(5);
+/*
+pin7 - reserved for buttons
+pin6 - reserved for buttons
 
-  unsigned int a = 65535;
-  unsigned int b = 1;
+pin5 - C 
+pin4 - A
+pin3 - D
+pin2 - B
+
+pin8 - relay with current sensor
+pin9 - relay with current sensor
+
+pin10 - relay without current sensor
+pin11 - relay without current sensor
+
+A0 - current sensor input
+*/
+
+Door door;
+Button doorRemoteButton(4, 100, 800, 800);
 
 
 void setup() {
@@ -16,36 +31,28 @@ void setup() {
   Serial.begin(9600);
   #endif
   
-  button.setup();
-  pinMode(A0, INPUT);
-  pinMode(8, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
+  door.setup();
+  doorRemoteButton.setup();
 
-
-  digitalWrite(8, HIGH);
-  digitalWrite(9, HIGH);
-  digitalWrite(10, HIGH);
-  digitalWrite(11, HIGH);
-  //door.setup();
+  delay(3000);
 }
 
 void loop() {
-  button.run();
-  
-  if(button.isLongPressed()) {
-    Serial.println("AAAAAAAAAAAAAAAAAAAAAAAAAAA");
-    digitalWrite(8, !digitalRead(8));
-  }
-  
-  if(button.isPressed()) {
-    Serial.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-    digitalWrite(9, !digitalRead(9));
-  }
-  //Serial.println(analogRead(A0));
+  door.run();
+  doorRemoteButton.run();
 
-  //door.run();
+  if(doorRemoteButton.isLongPressed()) {
+    switch(door.state()) {
+      case DoorState::Closed:
+        door.open();
+        break;
+      case DoorState::Opened:
+        door.close();
+        break;
+      default:
+        Serial.println("The door control button pressed while the door is busy");    
+    };
+  }  
 }
 
 
