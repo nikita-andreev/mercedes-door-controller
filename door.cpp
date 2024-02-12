@@ -4,12 +4,14 @@ Door::Door() {
   _state = DoorState::Error;
   overloadStartTime = 0;
   operationStartTime = 0;
+  eventOpened = false;
+  eventClosed = false;
 }
 
 bool Door::isBlocked()
 {
   unsigned long overloadTime = 0;
-  if(motorCurrent() < MAX_CURRENT_VALUE) // The op < is right, since 512 = 0A, 310 = 5A
+  if(operationTime() > START_DELAY && motorCurrent() < MAX_CURRENT_VALUE) // The op < is right, since 512 = 0A, 310 = 5A
   {
     if(overloadStartTime == 0) {
       overloadStartTime = millis(); 
@@ -46,6 +48,7 @@ void Door::run()
   
   if (isBlocked() == true) {
     Serial.println("Door is blocked");
+    Serial.println(operationTime());
     stop();
     if(_state == DoorState::Closing && operationTime() > 0 && operationTime() < MIN_OPERATION_SUCCESS_TIME) {
       Serial.println("Something wrong. Error");
@@ -56,13 +59,18 @@ void Door::run()
         case DoorState::Closing:
           Serial.println("The door is closed"); 
           _state = DoorState::Closed;
+          eventClosed = true;
           operationStartTime = 0;
           break;
         case DoorState::Opening:
           Serial.println("The door is opened"); 
           _state = DoorState::Opened;
+          eventOpened = true;
           operationStartTime = 0;
           break;
+        case DoorState::Opened:
+          operationStartTime = 0;
+          break;  
         default:
           Serial.println("Door state error detected!");
           _state = DoorState::Error;   
@@ -83,6 +91,8 @@ void Door::stop()
 {
   digitalWrite(DOOR_OPEN_PIN, HIGH);
   digitalWrite(DOOR_CLOSE_PIN, HIGH);
+  eventOpened = false;
+  eventClosed = false;
 }
 
 void Door::open()
@@ -130,4 +140,20 @@ unsigned long Door::operationTime()
 
 DoorState Door::state() {
   return _state;
+}
+
+bool Door::hasOpened()
+{
+  bool result = eventOpened;
+  if(result)
+    eventOpened = false;
+  return result;  
+}
+
+bool Door::hasClosed()
+{
+  bool result = eventClosed;
+  if(result)
+    eventClosed = false;
+  return result;  
 }

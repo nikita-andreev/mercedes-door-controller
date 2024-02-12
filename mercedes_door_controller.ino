@@ -52,7 +52,15 @@ void loop() {
       default:
         Serial.println("The door control button pressed while the door is busy");    
     };
-  }  
+  }
+
+  if(door.hasOpened()) {
+    Serial.println("The door was opened successfully. Turning lights on?");
+  }
+
+  if(door.hasClosed()) {
+    Serial.println("The door was closed successfully. Turning lights off?");
+  } 
 }
 
 
