@@ -1,6 +1,6 @@
 #include "button.h"
 
-static int Button::pressedLevel() {
+int Button::pressedLevel() {
   return HIGH;
 }
 

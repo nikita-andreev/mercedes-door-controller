@@ -10,7 +10,7 @@ enum class ButtonState {Pressed, Released};
 
 class Button {
   public:
-    static int pressedLevel();
+    virtual int pressedLevel();
     Button(byte pin);
     Button(byte pin, int short_time, int long_time, int fuse_timeout);
     void setup();
