@@ -27,3 +27,9 @@ For the `Button` class and derived classes, the constructor takes 4 parameters:
 - `int fuse_timeout` - a time to ignore (in milliseconds) any button inputs if the event was raised. This is provided to handle possible contact chatter effects
 
 ## Some photos in high resolution might help with understanding the schematic :)
+
+![Controller](https://github.com/nikita-andreev/mercedes-door-controller/assets/3277670/4b48bf23-0739-48bc-81f5-e15026dbb88e)
+
+![IMG_1624](https://github.com/nikita-andreev/mercedes-door-controller/assets/3277670/f62816c0-8793-4026-9821-9e26b9118abe)
+
+
